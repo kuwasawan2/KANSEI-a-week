@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>週イチ（仮）— 毎週1作の個人制作</title>
+<style>
+:root{--bg:#f3f1ec;--fg:#151515;--sub:#6d6a64;--line:#dcd7cd;--card:#fff;--acc:#ff4b17;--r:12px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.65 system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(243,241,236,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.logo{font-weight:800;font-size:18px;text-decoration:none;letter-spacing:.02em}
+.logo b{color:var(--acc)}
+nav{display:flex;gap:2px;margin-left:auto;align-items:center;flex-wrap:wrap}
+nav a{padding:6px 10px;border-radius:8px;text-decoration:none;color:var(--sub)}
+nav a.on,nav a:hover{color:var(--fg);background:#e7e3da}
+.btn{border:1px solid var(--fg);background:transparent;padding:8px 16px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.btn.primary{background:var(--fg);color:#fff}
+.btn.acc{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn.sm{padding:4px 12px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+main{max-width:1120px;margin:0 auto;padding:28px 20px 80px}
+.demo{background:#151515;color:#fff;font-size:13px;text-align:center;padding:6px 12px}
+.hero{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end;padding:8px 0 28px;border-bottom:1px solid var(--line);margin-bottom:28px}
+.wk{font-size:13px;letter-spacing:.12em;color:var(--sub)}
+.wk b{color:var(--fg);font-size:15px}
+.cd{font-variant-numeric:tabular-nums;font-weight:800;font-size:clamp(38px,8vw,76px);line-height:1;letter-spacing:-.02em;margin-top:6px}
+.cd small{font-size:.32em;font-weight:600;color:var(--sub);margin:0 .25em 0 .1em}
+.lead{color:var(--sub);margin:8px 0 0}
+h2{font-size:16px;margin:0 0 14px;display:flex;gap:10px;align-items:baseline}
+h2 span{color:var(--sub);font-weight:400;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
+.card{background:var(--card);border-radius:var(--r);overflow:hidden;cursor:pointer;border:1px solid transparent;transition:transform .15s,border-color .15s;text-align:left;padding:0}
+.card:hover{transform:translateY(-2px);border-color:var(--line)}
+.card img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;background:#e6e2d9}
+.card .meta{padding:10px 12px 12px}
+.card .t{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card .a{font-size:13px;color:var(--sub);display:flex;justify-content:space-between;gap:8px}
+.chip{display:inline-block;font-size:11px;padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--sub);white-space:nowrap}
+.empty{padding:48px 20px;text-align:center;color:var(--sub);border:1px dashed var(--line);border-radius:var(--r)}
+.row{display:grid;grid-template-columns:150px 1fr;gap:16px;padding:16px 0;border-bottom:1px solid var(--line);text-decoration:none;align-items:center}
+.row:hover{background:#ebe8e0}
+.row .n{font-weight:800}
+.row .d{font-size:13px;color:var(--sub)}
+.thumbs{display:flex;gap:6px;overflow:hidden}
+.thumbs img{width:72px;height:54px;object-fit:cover;border-radius:6px;flex:none}
+.stats{display:flex;gap:32px;margin:6px 0 24px;flex-wrap:wrap}
+.stats div{font-size:13px;color:var(--sub)}
+.stats b{display:block;font-size:34px;color:var(--fg);line-height:1.1}
+.heat{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:32px}
+.heat i{width:18px;height:18px;border-radius:4px;background:#e2ded4}
+.heat i.on{background:var(--fg)}
+.heat i.now{outline:2px solid var(--acc);outline-offset:1px}
+dialog{border:0;border-radius:16px;padding:0;width:min(760px,94vw);max-height:92vh;background:var(--bg);color:var(--fg)}
+dialog::backdrop{background:rgba(20,20,20,.55)}
+.dlg{padding:24px;overflow:auto;max-height:92vh}
+.dlg h3{margin:0 0 4px;font-size:22px}
+.x{float:right;border:0;background:none;font-size:22px;cursor:pointer;line-height:1}
+.big{width:100%;border-radius:10px;margin:14px 0;background:#e6e2d9;max-height:60vh;object-fit:contain}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:6px 12px;font-size:14px;margin:12px 0}
+.kv dt{color:var(--sub)}
+.kv dd{margin:0;white-space:pre-wrap}
+.ask{background:#fff;border-left:3px solid var(--acc);padding:10px 14px;border-radius:6px;margin:14px 0}
+.cm{border-top:1px solid var(--line);padding:10px 0;font-size:14px}
+.cm b{margin-right:8px}
+label{display:block;font-size:13px;color:var(--sub);margin:14px 0 4px}
+input[type=text],input[type=email],input[type=number],select,textarea{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:#fff}
+textarea{min-height:64px;resize:vertical}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.drop{border:1px dashed var(--sub);border-radius:10px;padding:16px;text-align:center;cursor:pointer;background:#fff;color:var(--sub)}
+.drop img{max-width:100%;max-height:240px;border-radius:6px;display:block;margin:0 auto}
+.foot{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--fg);color:#fff;padding:10px 18px;border-radius:999px;font-size:14px;z-index:99}
+.rules{font-size:13px;color:var(--sub);margin:40px 0 0;padding-top:20px;border-top:1px solid var(--line)}
+.rules ol{padding-left:20px;margin:6px 0}
+@media (max-width:640px){.hero{grid-template-columns:1fr}.row{grid-template-columns:1fr}.two{grid-template-columns:1fr}header{padding:10px 14px}.logo{white-space:nowrap}nav a{padding:6px 7px;font-size:14px}.grid{grid-template-columns:1fr 1fr;gap:10px}.card .meta{padding:8px 10px}.toast{white-space:nowrap}}
+</style>
+</head>
+<body>
+<div id="demo" class="demo" hidden>お試しモード：データはこのブラウザの中だけで、再読み込みすると消えます（Supabase未設定）</div>
+<header>
+  <a class="logo" href="#/">週イチ<b>.</b></a>
+  <nav>
+    <a href="#/" data-r="">今週</a>
+    <a href="#/archive" data-r="archive">アーカイブ</a>
+    <a href="#/me" data-r="me">マイページ</a>
+    <span id="auth"></span>
+  </nav>
+</header>
+<main id="app"></main>
+
+<dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
+
+<script type="module">
+// ================= 設定（ここに Supabase の値を貼る） =================
+const SUPABASE_URL = 'https://bvvpoykqxwnugnfabokt.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_zge0nC0Amu-LJcEcdjxR5w_Au9IyNBl'; // publishable key（secret / service_role は絶対に貼らない）
+const SITE_START   = '2026-11-02'; // WEEK 01 の月曜日
+// ====================================================================
+
+const CATS = {product:'プロダクト',graphic:'グラフィック',ui:'UI',video:'映像',sound:'音',game:'ゲーム',other:'その他'};
+const DEMO = !SUPABASE_URL || !SUPABASE_KEY;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// ---------- 週の計算（日本時間・月曜始まり） ----------
+const addDays = (iso, n) => { const d = new Date(iso + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0,10); };
+const weekOf = (t = Date.now()) => { const j = new Date(t + 9*3600e3); const dow = (j.getUTCDay() + 6) % 7;
+  return new Date(Date.UTC(j.getUTCFullYear(), j.getUTCMonth(), j.getUTCDate() - dow)).toISOString().slice(0,10); };
+const CUR = weekOf();
+const START = DEMO ? addDays(CUR, -28) : SITE_START;
+const weekNo = iso => Math.round((Date.parse(iso) - Date.parse(START)) / 6048e5) + 1;
+const md = iso => { const [ , m, d] = iso.split('-'); return `${+m}/${+d}`; };
+const wkLabel = iso => `WEEK ${String(weekNo(iso)).padStart(2,'0')}`;
+const range = iso => `${md(iso)}–${md(addDays(iso,6))}`;
+const deadline = Date.parse(addDays(CUR, 7) + 'T00:00:00+09:00');
+const allWeeks = () => { const a = []; for (let w = START; w <= CUR; w = addDays(w, 7)) a.push(w); return a; };
+
+// ---------- データのやりとり：Supabase版 ----------
+function supaApi(sb) {
+  const norm = p => ({ ...p, author: p.profiles?.display_name || '名無し' });
+  const ok = ({ data, error }) => { if (error) throw error; return data; };
+  return {
+    async user() { return (await sb.auth.getSession()).data.session?.user ?? null; },
+    // 通知の中で直接Supabaseを呼ぶと固まるため、いったん処理を後回しにする
+    onAuth(cb) { sb.auth.onAuthStateChange((e, s) => setTimeout(() => cb(e, s?.user ?? null), 0)); },
+    async signIn(email, password) { ok(await sb.auth.signInWithPassword({ email, password })); },
+    async signUp(email, password) {
+      const d = ok(await sb.auth.signUp({ email, password }));
+      if (!d.session) throw new Error('Supabaseの「Confirm email」がオンのままです。オフにしてください');
+    },
+    async signOut() { await sb.auth.signOut(); },
+    async profile(uid) { return ok(await sb.from('profiles').select('*').eq('id', uid).maybeSingle()); },
+    async saveProfile(uid, name) { ok(await sb.from('profiles').upsert({ id: uid, display_name: name })); },
+    async week(w) { return ok(await sb.from('posts').select('*, profiles(display_name)').eq('week_start', w).order('created_at')).map(norm); },
+    async thumbs() { return ok(await sb.from('posts').select('id, week_start, image_path').order('created_at')); },
+    async byUser(uid) { return ok(await sb.from('posts').select('*, profiles(display_name)').eq('user_id', uid).order('week_start', { ascending: false })).map(norm); },
+    async post(id) { return norm(ok(await sb.from('posts').select('*, profiles(display_name)').eq('id', id).single())); },
+    async create(f, blob, uid) {
+      const path = `${uid}/${crypto.randomUUID()}.jpg`;
+      ok(await sb.storage.from('works').upload(path, blob, { contentType: 'image/jpeg' }));
+      const r = await sb.from('posts').insert({ ...f, image_path: path });
+      if (r.error) { await sb.storage.from('works').remove([path]); throw r.error; }
+    },
+    async remove(p) { ok(await sb.from('posts').delete().eq('id', p.id)); await sb.storage.from('works').remove([p.image_path]); },
+    async comments(pid) { return ok(await sb.from('comments').select('*, profiles(display_name)').eq('post_id', pid).order('created_at')).map(norm); },
+    async comment(pid, body) { ok(await sb.from('comments').insert({ post_id: pid, body })); },
+    img(path) { return sb.storage.from('works').getPublicUrl(path).data.publicUrl; },
+  };
+}
+
+// ---------- データのやりとり：お試し版（ブラウザ内だけ） ----------
+function demoApi() {
+  const svg = (h, s) => 'data:image/svg+xml,' + encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="hsl(${h} 35% 84%)"/>` +
+    (s % 3 === 0 ? `<circle cx="150" cy="150" r="80" fill="hsl(${h} 60% 52%)"/><rect x="220" y="80" width="110" height="140" rx="16" fill="hsl(${(h+50)%360} 45% 30%)"/>`
+    : s % 3 === 1 ? `<path d="M40 240 L200 50 L360 240Z" fill="hsl(${h} 55% 45%)"/><circle cx="290" cy="90" r="30" fill="#fff"/>`
+    : `<rect x="60" y="60" width="280" height="180" rx="24" fill="#fff"/><rect x="90" y="90" width="120" height="120" rx="60" fill="hsl(${h} 60% 50%)"/><rect x="230" y="100" width="80" height="12" fill="#222"/><rect x="230" y="125" width="60" height="12" fill="#999"/>`) + `</svg>`);
+  const people = [['u1','あおい'],['u2','けんた'],['u3','みお'],['u4','ゆうと']];
+  const titles = [['照明の影を設計する','product','ペン型スタンドライトのスタディ。影の形から逆算。'],['架空の銭湯のポスター','graphic','書体を1つだけで作る縛り。'],['3秒で終わるゲーム','game','ボタン1つ・3秒の判断だけのゲーム。'],['天気で鳴る音','sound','天気APIの数値で和音を変える試作。'],['電卓の新しい押し心地','ui','キーを長押しすると桁が変わるUI。'],['紙で作るスピーカー','product','ケント紙だけで箱を折った。'],['駅の時刻表を描き直す','graphic','乗り換え時間を色で見せる。'],['15秒の手のアニメ','video','コマ撮り40枚。'],['付箋で動く家計簿','ui','付箋の色で分類するアプリ案。'],['積み木の重さ当て','game','見た目と重さがずれる積み木。'],['ドアの開く音を集める','sound','学校中のドアを録音して並べた。'],['持ちやすいハサミ','product','握りの断面を5案比べた。']];
+  const profiles = Object.fromEntries(people.map(([id, n]) => [id, { id, display_name: n }]));
+  let posts = [], comments = [], k = 0, me = null;
+  allWeeks().forEach((w, wi) => people.forEach(([uid], pi) => {
+    if ((wi + pi) % 4 === 3 || (w === CUR && pi > 1)) return;
+    const [title, category, done] = titles[k % titles.length];
+    posts.push({ id: 'p' + k, user_id: uid, week_start: w, title, category, image_path: svg((k * 47) % 360, k), hours: 4 + (k % 6) * 1.5,
+      tools: ['Illustrator','Fusion 360','紙・カッター','Unity','Ableton Live','Figma'][k % 6], wanted: 'もっと大きな構想があったが1週間に収まる形に絞った。', done, next_try: '次は素材を変えて同じ問いを試す。',
+      feedback_ask: '第一印象で何に見えたか教えてほしい', created_at: new Date(Date.parse(w) + pi * 864e5).toISOString() });
+    if (k % 3 === 0) comments.push({ id: 'c' + k, post_id: 'p' + k, user_id: people[(pi + 1) % 4][0], body: '影の出方がきれい。もう少し低い位置からの写真も見たい。', created_at: new Date().toISOString() });
+    k++;
+  }));
+  const withAuthor = p => ({ ...p, author: profiles[p.user_id]?.display_name || '名無し' });
+  let authCb = () => {};
+  return {
+    async user() { return me; },
+    onAuth(cb) { authCb = cb; },
+    async signIn() { me = { id: 'me', email: 'demo@example.com' }; authCb('SIGNED_IN', me); },
+    async signOut() { me = null; authCb('SIGNED_OUT', null); },
+    async profile(uid) { return profiles[uid] || null; },
+    async saveProfile(uid, name) { profiles[uid] = { id: uid, display_name: name }; },
+    async week(w) { return posts.filter(p => p.week_start === w).sort((a, b) => a.created_at < b.created_at ? -1 : 1).map(withAuthor); },
+    async thumbs() { return posts; },
+    async byUser(uid) { return posts.filter(p => p.user_id === uid).sort((a, b) => a.week_start < b.week_start ? 1 : -1).map(withAuthor); },
+    async post(id) { return withAuthor(posts.find(p => p.id === id)); },
+    async create(f, blob, uid) {
+      if (posts.some(p => p.user_id === uid && p.week_start === CUR)) throw new Error('今週はもう提出済みです');
+      posts.push({ ...f, id: 'p' + (++k), user_id: uid, week_start: CUR, image_path: URL.createObjectURL(blob), created_at: new Date().toISOString() });
+    },
+    async remove(p) { posts = posts.filter(x => x.id !== p.id); },
+    async comments(pid) { return comments.filter(c => c.post_id === pid).map(withAuthor); },
+    async comment(pid, body) { comments.push({ id: 'c' + Date.now(), post_id: pid, user_id: me.id, body, created_at: new Date().toISOString() }); },
+    img(path) { return path; },
+  };
+}
+
+// ---------- 起動 ----------
+let api, user = null, profile = null;
+if (DEMO) { api = demoApi(); $('#demo').hidden = false; }
+else { const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2'); api = supaApi(createClient(SUPABASE_URL, SUPABASE_KEY)); }
+
+async function setUser(u) {
+  user = u; profile = u ? await api.profile(u.id) : null;
+  renderAuth();
+  if (u && !profile) openName();
+}
+// ログイン状態が本当に変わったときだけ画面を作り直す（再接続などの通知では何もしない）
+let lastUid;
+api.onAuth((e, u) => {
+  const id = u?.id ?? null;
+  if (id === lastUid) return;
+  lastUid = id;
+  setUser(u).then(route);
+});
+if (DEMO) { lastUid = null; await setUser(null); }
+
+function renderAuth() {
+  $('#auth').innerHTML = user
+    ? `<button class="btn sm" id="out">${esc(profile?.display_name || 'ログイン中')} ・ ログアウト</button>`
+    : `<button class="btn sm primary" id="in">ログイン</button>`;
+  $('#auth button').onclick = user ? () => api.signOut() : openLogin;
+}
+
+function toast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.append(t); setTimeout(() => t.remove(), 2600); }
+const dlg = $('#dlg');
+function openDlg(html) { $('#dlgBody').innerHTML = `<button class="x" aria-label="閉じる" onclick="this.closest('dialog').close()">×</button>` + html; if (!dlg.open) dlg.showModal(); $('#dlgBody').scrollTop = 0; }
+dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+
+// ---------- 画面：今週 ----------
+async function viewHome() {
+  const posts = await api.week(CUR);
+  const mine = user && posts.find(p => p.user_id === user.id);
+  return `
+  <section class="hero">
+    <div>
+      <div class="wk"><b>${wkLabel(CUR)}</b>　${range(CUR)}</div>
+      <div class="cd" id="cd"></div>
+      <p class="lead">日曜 23:59 締切。未完成でも、出したら完成。</p>
+    </div>
+    <div>${mine ? `<button class="btn" data-open="${mine.id}">提出済み ✓ 自分の作品を見る</button>`
+                 : `<button class="btn acc" id="submit">今週の1作を出す</button>`}</div>
+  </section>
+  <h2>今週の作品 <span>${posts.length}作品</span></h2>
+  ${posts.length ? `<div class="grid">${posts.map(card).join('')}</div>` : `<div class="empty">まだ誰も出していません。最初の1作をどうぞ。</div>`}
+  <div class="rules"><b>ルール</b><ol>
+    <li>月曜0:00〜日曜23:59（日本時間）で1週1作</li><li>未完成でも締切時点のものを出す</li>
+    <li>前の週の作品の続きは出さない</li><li>テーマ・素材・手法・道具のどれかを毎週変える</li>
+    <li>振り返りを書く。見てほしい点を1つ添える</li><li>出せなかった週は「休み」。責めない</li></ol></div>`;
+}
+const card = p => `<button class="card" data-open="${p.id}"><img loading="lazy" src="${esc(api.img(p.image_path))}" alt=""><div class="meta">
+  <div class="t">${esc(p.title)}</div><div class="a"><span>${esc(p.author)}</span><span class="chip">${CATS[p.category] || ''}</span></div></div></button>`;
+
+// ---------- 画面：アーカイブ ----------
+async function viewArchive() {
+  const all = await api.thumbs();
+  return `<h2>アーカイブ <span>週ごとの作品</span></h2>` + allWeeks().reverse().map(w => {
+    const ps = all.filter(p => p.week_start === w);
+    return `<a class="row" href="#/week/${w}"><div><div class="n">${wkLabel(w)}${w === CUR ? ' <span class="chip">今週</span>' : ''}</div><div class="d">${range(w)}・${ps.length}作品</div></div>
+      <div class="thumbs">${ps.slice(0, 8).map(p => `<img loading="lazy" src="${esc(api.img(p.image_path))}" alt="">`).join('') || '<span class="d">投稿なし</span>'}</div></a>`;
+  }).join('');
+}
+async function viewWeek(w) {
+  const posts = await api.week(w);
+  return `<p><a href="#/archive">← アーカイブ</a></p><h2>${wkLabel(w)} <span>${range(w)}・${posts.length}作品</span></h2>
+  ${posts.length ? `<div class="grid">${posts.map(card).join('')}</div>` : `<div class="empty">この週の投稿はありません</div>`}`;
+}
+
+// ---------- 画面：マイページ ----------
+async function viewMe() {
+  if (!user) return `<div class="empty">マイページを見るにはログインしてください<br><br><button class="btn primary" id="loginHere">ログイン</button></div>`;
+  const posts = await api.byUser(user.id);
+  const done = new Set(posts.map(p => p.week_start));
+  let streak = 0, w = done.has(CUR) ? CUR : addDays(CUR, -7);
+  while (w >= START && done.has(w)) { streak++; w = addDays(w, -7); }
+  const weeks = allWeeks();
+  return `<h2>${esc(profile?.display_name)} <span><button class="btn sm" id="rename">名前を変える</button></span></h2>
+  <div class="stats"><div><b>${streak}</b>連続週</div><div><b>${posts.length}</b>作品</div><div><b>${weeks.length - done.size - (done.has(CUR) ? 0 : 1)}</b>休み</div></div>
+  <div class="heat" title="1マス=1週">${weeks.map(w => `<i class="${done.has(w) ? 'on' : ''} ${w === CUR ? 'now' : ''}" title="${wkLabel(w)} ${range(w)}"></i>`).join('')}</div>
+  <h2>自分の作品</h2>${posts.length ? `<div class="grid">${posts.map(card).join('')}</div>` : `<div class="empty">まだ作品がありません</div>`}`;
+}
+
+// ---------- 作品の詳細 ----------
+async function openPost(id) {
+  const [p, cs] = await Promise.all([api.post(id), api.comments(id)]);
+  const canDel = user && p.user_id === user.id && p.week_start === CUR;
+  openDlg(`
+    <div class="wk">${wkLabel(p.week_start)}　${range(p.week_start)}　<span class="chip">${CATS[p.category] || ''}</span></div>
+    <h3>${esc(p.title)}</h3><div style="color:var(--sub)">${esc(p.author)}</div>
+    <img class="big" src="${esc(api.img(p.image_path))}" alt="">
+    ${p.feedback_ask ? `<div class="ask"><b>見てほしい点</b><br>${esc(p.feedback_ask)}</div>` : ''}
+    <dl class="kv">
+      ${p.hours ? `<dt>制作時間</dt><dd>${esc(p.hours)} 時間</dd>` : ''}
+      ${p.tools ? `<dt>道具</dt><dd>${esc(p.tools)}</dd>` : ''}
+      ${p.wanted ? `<dt>やりたかったこと</dt><dd>${esc(p.wanted)}</dd>` : ''}
+      ${p.done ? `<dt>できたこと</dt><dd>${esc(p.done)}</dd>` : ''}
+      ${p.next_try ? `<dt>次に試すこと</dt><dd>${esc(p.next_try)}</dd>` : ''}
+    </dl>
+    <h2 style="margin-top:24px">コメント <span>${cs.length}件・良かった点＋提案1つ</span></h2>
+    ${cs.map(c => `<div class="cm"><b>${esc(c.author)}</b>${esc(c.body)}</div>`).join('')}
+    ${user ? `<form id="cform" style="margin-top:10px"><textarea name="body" required maxlength="500" placeholder="良かった点と、ひとつの提案"></textarea>
+      <div class="foot">${canDel ? `<button type="button" class="btn" id="del">この作品を取り下げる</button>` : ''}<button class="btn primary">コメントする</button></div></form>`
+      : `<p style="color:var(--sub);font-size:14px">コメントするにはログインしてください</p>`}`);
+  const f = $('#cform');
+  if (f) f.onsubmit = async e => { e.preventDefault(); try { await api.comment(id, f.body.value.trim()); openPost(id); } catch (err) { toast(err.message); } };
+  const d = $('#del');
+  if (d) d.onclick = async () => { if (!confirm('取り下げますか？今週中なら出し直せます')) return; try { await api.remove(p); dlg.close(); route(); toast('取り下げました'); } catch (err) { toast(err.message); } };
+}
+
+// ---------- 投稿フォーム ----------
+function openSubmit() {
+  if (!user) return openLogin();
+  if (!profile) return openName();
+  openDlg(`<h3>${wkLabel(CUR)} の1作を出す</h3><div style="color:var(--sub);font-size:13px">${range(CUR)}・出したら完成</div>
+  <form id="sform">
+    <label>画像（必須・自動で縮小されます）</label>
+    <div class="drop" id="drop">タップして画像を選ぶ<input type="file" name="img" accept="image/*" hidden required></div>
+    <label>タイトル</label><input type="text" name="title" required maxlength="60">
+    <div class="two"><div><label>カテゴリ</label><select name="category">${Object.entries(CATS).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select></div>
+      <div><label>制作時間（時間）</label><input type="number" name="hours" min="0" max="168" step="0.5"></div></div>
+    <label>使った道具</label><input type="text" name="tools" maxlength="200" placeholder="例：Fusion 360、ケント紙">
+    <label>やりたかったこと</label><textarea name="wanted" maxlength="400"></textarea>
+    <label>できたこと</label><textarea name="done" maxlength="400"></textarea>
+    <label>次に試すこと</label><textarea name="next_try" maxlength="400"></textarea>
+    <label>見てほしい点（1つ）</label><input type="text" name="feedback_ask" maxlength="200">
+    <div class="foot"><button type="button" class="btn" onclick="this.closest('dialog').close()">やめる</button><button class="btn acc" id="go">提出する</button></div>
+  </form>`);
+  const f = $('#sform'), drop = $('#drop'), inp = f.img;
+  drop.onclick = () => inp.click();
+  inp.onchange = () => { const file = inp.files[0]; if (file) drop.innerHTML = `<img src="${URL.createObjectURL(file)}" alt="">`, drop.append(inp); };
+  f.onsubmit = async e => {
+    e.preventDefault();
+    if (!inp.files[0]) return toast('画像を選んでください');
+    $('#go').disabled = true; $('#go').textContent = '送信中…';
+    try {
+      const blob = await shrink(inp.files[0]);
+      const v = k => f[k].value.trim() || null;
+      await api.create({ title: v('title'), category: f.category.value, hours: f.hours.value ? +f.hours.value : null,
+        tools: v('tools'), wanted: v('wanted'), done: v('done'), next_try: v('next_try'), feedback_ask: v('feedback_ask') }, blob, user.id);
+      dlg.close(); location.hash = '#/'; route(); toast('提出しました。おつかれさまでした');
+    } catch (err) {
+      toast(/duplicate|unique/i.test(err.message) ? '今週はもう提出済みです' : err.message);
+      $('#go').disabled = false; $('#go').textContent = '提出する';
+    }
+  };
+}
+// 長い辺を1600pxまで縮小してJPEG化（1枚あたり数百KBに収まる）
+async function shrink(file, max = 1600, q = 0.82) {
+  const bmp = await createImageBitmap(file);
+  const s = Math.min(1, max / Math.max(bmp.width, bmp.height));
+  const c = Object.assign(document.createElement('canvas'), { width: Math.round(bmp.width * s), height: Math.round(bmp.height * s) });
+  const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(bmp, 0, 0, c.width, c.height);
+  return new Promise(r => c.toBlob(r, 'image/jpeg', q));
+}
+
+// ---------- ログイン・名前 ----------
+function openLogin() {
+  if (DEMO) return api.signIn();
+  openDlg(`<h3>ログイン</h3><p style="color:var(--sub);font-size:14px">はじめての人は「新規登録」を押してください。</p>
+  <form id="lform">
+    <label>メールアドレス</label><input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+    <label>パスワード（6文字以上）</label><input type="password" name="pw" required minlength="6" autocomplete="current-password" style="width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:8px">
+    <div class="foot"><button type="button" class="btn" id="signup">新規登録</button><button class="btn primary">ログイン</button></div>
+  </form>`);
+  const f = $('#lform');
+  const run = async fn => {
+    if (!f.reportValidity()) return;
+    try { await fn(f.email.value.trim(), f.pw.value); dlg.close(); }
+    catch (err) { toast(authMsg(err.message)); }
+  };
+  f.onsubmit = e => { e.preventDefault(); run(api.signIn); };
+  $('#signup').onclick = () => run(api.signUp);
+}
+const authMsg = m => /invalid login/i.test(m) ? 'メールアドレスかパスワードが違います'
+  : /already registered/i.test(m) ? 'このメールアドレスは登録済みです。「ログイン」を押してください'
+  : /at least 6|weak/i.test(m) ? 'パスワードは6文字以上にしてください'
+  : /rate limit/i.test(m) ? '短時間に試しすぎました。少し待ってからもう一度どうぞ' : m;
+function openName() {
+  openDlg(`<h3>表示名を決める</h3><p style="color:var(--sub);font-size:14px">作品やコメントに表示される名前です。</p>
+  <form id="nform"><input type="text" name="n" required maxlength="30" value="${esc(profile?.display_name || '')}"><div class="foot"><button class="btn primary">決定</button></div></form>`);
+  $('#nform').onsubmit = async e => { e.preventDefault(); try { await api.saveProfile(user.id, e.target.n.value.trim()); profile = await api.profile(user.id); dlg.close(); renderAuth(); route(); } catch (err) { toast(err.message); } };
+}
+
+// ---------- 画面の切り替え ----------
+async function route() {
+  const [, a, b] = (location.hash.slice(1) || '/').split('/');
+  document.querySelectorAll('nav a').forEach(n => n.classList.toggle('on', n.dataset.r === (a || '')));
+  try {
+    $('#app').innerHTML = a === 'archive' ? await viewArchive() : a === 'week' && b ? await viewWeek(b) : a === 'me' ? await viewMe() : await viewHome();
+  } catch (err) { $('#app').innerHTML = `<div class="empty">読み込みに失敗しました：${esc(err.message)}</div>`; }
+  tick();
+}
+document.addEventListener('click', e => {
+  const o = e.target.closest('[data-open]'); if (o) return openPost(o.dataset.open);
+  if (e.target.closest('#submit')) return openSubmit();
+  if (e.target.closest('#loginHere')) return openLogin();
+  if (e.target.closest('#rename')) return openName();
+});
+function tick() {
+  const el = $('#cd'); if (!el) return;
+  let s = Math.max(0, Math.floor((deadline - Date.now()) / 1000));
+  const d = Math.floor(s / 86400); s %= 86400;
+  const p = n => String(n).padStart(2, '0');
+  el.innerHTML = `${d}<small>日</small>${p(Math.floor(s / 3600))}:${p(Math.floor(s % 3600 / 60))}:${p(s % 60)}`;
+}
+setInterval(tick, 1000);
+addEventListener('hashchange', route);
+route();
+</script>
+</body>
+</html>
